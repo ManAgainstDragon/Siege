@@ -28,7 +28,7 @@ sys& sys::GetInstance() {
 Initializes the game
 */
 void sys::Init(std::string _name) {
-	sf::VideoMode size = sf::VideoMode(600, 600);
+	sf::VideoMode size = sf::VideoMode(WIDTH, HEIGHT);
 	this->create(size, _name);
 }
 
@@ -41,6 +41,7 @@ void sys::Start() {
 	while (this->isOpen()) {
 		while (this->pollEvent(_ev)) {
 			InsertEvent(&_ev);
+			if (InEv->type == sf::Event::Closed) Stop();
 			this->clear();
 			this->Update(_timer.restart().asSeconds());
 			this->Render();

@@ -44,4 +44,7 @@
     </ClInclude>
     <ClInclude Include="stdafx.h" />
   </ItemGroup>
+  <ItemGroup>
+    <Text Include="temp.txt" />
+  </ItemGroup>
 </Project>

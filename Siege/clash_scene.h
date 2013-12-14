@@ -7,7 +7,8 @@
 
 struct field {
 	unsigned short int _units;
-	char* _owner;
+	char* _ownerType;
+	char* _ownerName;
 	char* _type;
 };
 
