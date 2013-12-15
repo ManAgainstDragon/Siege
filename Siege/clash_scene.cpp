@@ -15,108 +15,57 @@ clash::~clash() {
 }
 
 #include "sys.h"
-
-#define GRID_SIZ 3
 /*
 Renders all players positions every frame
 */
 void clash::Render() {
-	Window.clear(/*sf::Color(95, 95, 95)*/ sf::Color(64, 64, 64));
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
-			sf::RectangleShape temp;
-			sf::Vector2f size = sf::Vector2f(((WIDTH - GRID_SIZ * 8) / 7), ((HEIGHT - GRID_SIZ * 8) / 7));
-			sf::Vector2f position = sf::Vector2f(GRID_SIZ*(i + 1) + size.x * i, GRID_SIZ*(j + 1) + size.y * j);
-			sf::Color color;
-			if (_checkboardSmall[i][j]._ownerType == "player") {
-				color = GetSelectedPlayer(_checkboardSmall[i][j]._ownerName)._color;
-			}
-			else if (_checkboardSmall[i][j]._ownerType == "ai") {
-				if (_checkboardSmall[i][j]._type == "core") color = sf::Color(0xAB, 0x55, 0xFF);
-				else color = sf::Color(0x8B, 0xC5, 0xFF);
-			}
-			else color = sf::Color(150, 150, 150);
-			temp.setFillColor(color);
-			temp.setPosition(position);
-			temp.setSize(size);
-
-			Window.draw(temp);
-		} // FOR j
-	} // FOR i
+	sf::RectangleShape temp;
+	for (int i = 0; i < CHECKBOARD; i++) {
+		for (int j = 0; j < CHECKBOARD; j++) {
+			DrawUnit(_checkBoard[i][j], sf::Vector2i(i, j));
+		}
+	}
 }
 
 /*
 Updates player moves
 */
 void clash::Update(float dt) {
-
 }
 
 /*
 Filling the array of fields with starting set
 */
 void clash::Load() {
-	/* player temporary init */
-	// TODO: add creation of your own player
-	AddPlayer(0, "p1", sf::Color(0xFF, 0x55, 0x55));
-	AddPlayer(1, "p2", sf::Color(0xFF, 0xFF, 0x55));
-	AddPlayer(2, "p3", sf::Color(0xAB, 0xFF, 0x55));
-	AddPlayer(3, "p4", sf::Color(0x55, 0x55, 0xFF));
-	/* initialization of borad */
-	field temp;
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		for (int j = 0; j < BOARD_SIZE; j++) {
+	for (int i = 0; i < CHECKBOARD; i++) {
+		for (int j = 0; j < CHECKBOARD; j++) {
 			if (i == 0 && j == 0) {
-				temp._units = 10;
-				temp._type = "factory";
-				temp._ownerType = "player";
-				temp._ownerName = _players[0]._name;
-				_checkboardSmall[i][j] = temp;
+				_checkBoard[i][j]._entity = PLAYER1;
+				_checkBoard[i][j]._field = FACTORY;
+				_checkBoard[i][j]._units = 10;
 			}
-			else if (i == BOARD_SIZE - 1 && j == 0) {
-				temp._units = 10;
-				temp._type = "factory";
-				temp._ownerType = "player";
-				temp._ownerName = _players[1]._name;
-				_checkboardSmall[i][j] = temp;
+			else if (i == 0 && j == CHECKBOARD - 1) {
+				_checkBoard[i][j]._entity = PLAYER3;
+				_checkBoard[i][j]._field = FACTORY;
+				_checkBoard[i][j]._units = 10;
 			}
-			else if (i == 0 && j == BOARD_SIZE - 1) {
-				temp._units = 10;
-				temp._type = "factory";
-				temp._ownerType = "player";
-				temp._ownerName = _players[2]._name;
-				_checkboardSmall[i][j] = temp;
+			else if (i == CHECKBOARD - 1 && j == 0) {
+				_checkBoard[i][j]._entity = PLAYER2;
+				_checkBoard[i][j]._field = FACTORY;
+				_checkBoard[i][j]._units = 10;
 			}
-			else if (i == BOARD_SIZE - 1 && j == BOARD_SIZE - 1) {
-				temp._units = 10;
-				temp._type = "factory";
-				temp._ownerType = "player";
-				temp._ownerName = _players[3]._name;
-				_checkboardSmall[i][j] = temp;
-			}
-			else if ((i >= 2 && i <= 4) && (j >= 2 && j <= 4) && !(i == 3 && j == 3)) {
-				temp._units = 7 + abs(i - 4) + abs(j - 4);
-				temp._type = "defender";
-				temp._ownerType = "ai";
-				temp._ownerName = "ai";
-				_checkboardSmall[i][j] = temp;
-			}
-			else if (i == 3 && j == 3) {
-				temp._units = 10;
-				temp._type = "core";
-				temp._ownerType = "ai";
-				temp._ownerName = "ai";
-				_checkboardSmall[i][j] = temp;
+			else if (i == CHECKBOARD - 1 && j == CHECKBOARD - 1) {
+				_checkBoard[i][j]._entity = PLAYER4;
+				_checkBoard[i][j]._field = FACTORY;
+				_checkBoard[i][j]._units = 10;
 			}
 			else {
-				temp._units = 0;
-				temp._type = "wasteland";
-				temp._ownerType = "none";
-				temp._ownerName = "none";
-				_checkboardSmall[i][j] = temp;
+				_checkBoard[i][j]._entity = NONE;
+				_checkBoard[i][j]._field = WASTELAND;
+				_checkBoard[i][j]._units = 0;
 			}
-		} // FOR j
-	} // FOR i
+		}
+	}
 }
 
 /*
@@ -126,21 +75,27 @@ void clash::Unload() {
 
 }
 
-void clash::DrawUnit(sf::Color _color, sf::Vector2u _field) {
-	
-}
-
-void clash::AddPlayer(unsigned short int _which, char* _name, sf::Color _color) {
-	if (_which < 4 && _which >= 0) {
-		_players[_which]._name = _name;
-		_players[_which]._color = _color;
-		_players[_which]._didHeWon = false;
+/*
+Draws unit
+*/
+void clash::DrawUnit(field in, sf::Vector2i pos) {
+	int i = pos.x;
+	int j = pos.y;
+	sf::Vector2f size = sf::Vector2f((WIDTH - (GRID_SIZE*(CHECKBOARD + 1))) / CHECKBOARD, (WIDTH - (GRID_SIZE*(CHECKBOARD + 1))) / CHECKBOARD);
+	sf::Vector2f position = sf::Vector2f((i+1)*GRID_SIZE + i*size.x, (j+1)*GRID_SIZE + j*size.y);
+	sf::RectangleShape temp;
+	temp.setSize(size);
+	temp.setPosition(position);
+	if (in._entity == -1) temp.setFillColor(ColorWasteland);
+	else if (in._entity == 0) {
+		if (in._field == 2)	temp.setFillColor(ColorDefender);
+		else temp.setFillColor(ColorCore);
 	}
-}
-
-player clash::GetSelectedPlayer(char* _name) {
-	for (int i = 0; i < BOARD_SIZE; i++) {
-		if (_players[i]._name == _name) return _players[i];
+	else {
+		if (in._entity == 1) temp.setFillColor(ColorPlayer1);
+		else if (in._entity == 2) temp.setFillColor(ColorPlayer2);
+		else if (in._entity == 3) temp.setFillColor(ColorPlayer3);
+		else if (in._entity == 4) temp.setFillColor(ColorPlayer4);
 	}
-	return _players[0];
+	Window.draw(temp);
 }

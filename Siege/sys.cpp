@@ -29,7 +29,7 @@ Initializes the game
 */
 void sys::Init(std::string _name) {
 	sf::VideoMode size = sf::VideoMode(WIDTH, HEIGHT);
-	this->create(size, _name);
+	this->create(size, _name, sf::Style::Close);
 }
 
 /*
@@ -42,7 +42,7 @@ void sys::Start() {
 		while (this->pollEvent(_ev)) {
 			InsertEvent(&_ev);
 			if (InEv->type == sf::Event::Closed) Stop();
-			this->clear();
+			this->clear(sf::Color(110, 110, 110));
 			this->Update(_timer.restart().asSeconds());
 			this->Render();
 			this->display();
