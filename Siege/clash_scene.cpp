@@ -59,6 +59,18 @@ void clash::Load() {
 				_checkBoard[i][j]._field = FACTORY;
 				_checkBoard[i][j]._units = 10;
 			}
+			else if (i == floor((double) CHECKBOARD/2) && j == floor((double) CHECKBOARD/2)) {
+				_checkBoard[i][j]._entity = AI;
+				_checkBoard[i][j]._field = CORE;
+				_checkBoard[i][j]._units = 10;
+			}
+			else if (((i > floor((double) CHECKBOARD / 2) - 2) && (i < floor((double) CHECKBOARD / 2) + 2)
+				&& (j > floor((double) CHECKBOARD / 2) - 2) && (j < floor((double) CHECKBOARD / 2) + 2)) &&
+				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
+				_checkBoard[i][j]._entity = AI;
+				_checkBoard[i][j]._field = DEFENDER;
+				_checkBoard[i][j]._units = 6 + (i+j)%2;
+			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
 				_checkBoard[i][j]._field = WASTELAND;
