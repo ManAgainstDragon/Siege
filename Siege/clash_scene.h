@@ -12,6 +12,8 @@ struct field {
 	ENTITY_TYPE _entity;
 	FIELD_TYPE _field;
 	unsigned short _units;
+	sf::Vector2f _pos;
+	sf::Vector2f _siz;
 };
 
 #define ColorPlayer1	sf::Color(0x66, 0x66, 0xcc) //Ciemnoniebieski, przechodzacy w szary
@@ -36,9 +38,13 @@ public:
 	virtual void Load();
 	virtual void Unload();
 
-	void DrawUnit(field in, sf::Vector2i pos);
+	void DrawUnit(field& in, sf::Vector2i pos);
+	bool IsMouseOver(field in);
+	void DrawMarker(sf::Vector2i pos, sf::Color color);
 
 private:
 	field _checkBoard[CHECKBOARD][CHECKBOARD];
+	sf::Vector2i _currentMouseOver;
+	sf::Vector2i _currentChoosen;
 
 };
