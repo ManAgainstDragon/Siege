@@ -28,8 +28,9 @@ sys& sys::GetInstance() {
 Initializes the game
 */
 void sys::Init(std::string _name) {
+	_gameName = _name;
 	sf::VideoMode size = sf::VideoMode(WIDTH, HEIGHT);
-	this->create(size, _name, sf::Style::Close);
+	this->create(size, _gameName, sf::Style::Close);
 }
 
 /*
@@ -77,4 +78,11 @@ Grabs instance of screen manager
 void sys::SetGameManager(game_manager* _instance) {
 	if(_instance != NULL) _gmi = _instance;
 	else _gmi = new game_manager;
+}
+
+/*
+Puts "GameName - status" in titlebar
+*/
+void sys::UpdateStatusbar(std::string status) {
+	this->setTitle(_gameName + " - " + status);
 }

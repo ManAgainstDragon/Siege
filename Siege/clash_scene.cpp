@@ -1,12 +1,46 @@
 #include "clash_scene.h"
 
 /*
+All units are dead by default
+*/
+field::field() {
+	for (int i = 0; i < 10; i++) {
+		_units[i]._isExisiting = false;
+	}
+	_wasAttacked = false;
+}
+
+/*
+Returns number of units in the field
+*/
+unsigned short field::CountUnits() {
+	int k = 0;
+	for (int i = 0; i < 10; i++) {
+		if (_units[i]._isExisiting) k++;
+	}
+	return k;
+}
+
+/*
+Increases units by amount
+*/
+void field::TurnAlive(unsigned short k) {
+	for (unsigned short i = 0; i < 10 && k > 0; i++) {
+		if (!_units[i]._isExisiting) {
+			k--;
+			_units[i]._isExisiting = true;
+		}
+	}
+}
+
+/*
 Constructor
 */
 clash::clash() {
 	_currentMouseOver = sf::Vector2i(0, 0);
 	_currentChoosen = sf::Vector2i(-1, -1);
 	_font.loadFromFile("font.ttf");
+	_turn = PLAYER1;
 }
 
 /*
@@ -31,9 +65,9 @@ void clash::Render() {
 			DrawUnit(_checkBoard[i][j], sf::Vector2i(i, j));
 			if (_checkBoard[i][j]._field == FACTORY) DrawMarker(sf::Vector2i(i, j), sf::Color::Black);
 			if (_checkBoard[i][j]._entity != NONE) {
-				if (_checkBoard[i][j]._field == FACTORY) _number.setString("F: " + toString(_checkBoard[i][j]._units));
-				else if (_checkBoard[i][j]._field == CORE) _number.setString("CORE: " + toString(_checkBoard[i][j]._units));
-				else _number.setString(toString(_checkBoard[i][j]._units));
+				if (_checkBoard[i][j]._field == FACTORY) _number.setString("F: " + toString(_checkBoard[i][j].CountUnits()));
+				else if (_checkBoard[i][j]._field == CORE) _number.setString("CORE: " + toString(_checkBoard[i][j].CountUnits()));
+				else _number.setString(toString(_checkBoard[i][j].CountUnits()));
 				_number.setPosition(sf::Vector2f(_checkBoard[i][j]._pos.x + 5, _checkBoard[i][j]._pos.y + 5));
 				Window.draw(_number);
 			}
@@ -67,39 +101,38 @@ void clash::Load() {
 			if (i == 0 && j == 0) {
 				_checkBoard[i][j]._entity = PLAYER1;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j]._units = 10;
+				_checkBoard[i][j].TurnAlive(10);
 			}
 			else if (i == 0 && j == CHECKBOARD - 1) {
 				_checkBoard[i][j]._entity = PLAYER3;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j]._units = 10;
+				_checkBoard[i][j].TurnAlive(10);
 			}
 			else if (i == CHECKBOARD - 1 && j == 0) {
 				_checkBoard[i][j]._entity = PLAYER2;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j]._units = 10;
+				_checkBoard[i][j].TurnAlive(10);
 			}
 			else if (i == CHECKBOARD - 1 && j == CHECKBOARD - 1) {
 				_checkBoard[i][j]._entity = PLAYER4;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j]._units = 10;
+				_checkBoard[i][j].TurnAlive(10);
 			}
 			else if (i == floor((double) CHECKBOARD/2) && j == floor((double) CHECKBOARD/2)) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = CORE;
-				_checkBoard[i][j]._units = 10;
+				_checkBoard[i][j].TurnAlive(10);
 			}
 			else if (((i > floor((double) CHECKBOARD / 2) - 2) && (i < floor((double) CHECKBOARD / 2) + 2)
 				&& (j > floor((double) CHECKBOARD / 2) - 2) && (j < floor((double) CHECKBOARD / 2) + 2)) &&
 				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = DEFENDER;
-				_checkBoard[i][j]._units = 8 - (i+j)%2;
+				_checkBoard[i][j].TurnAlive(8 - (i + j) % 2);
 			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
 				_checkBoard[i][j]._field = WASTELAND;
-				_checkBoard[i][j]._units = 0;
 			}
 		}
 	}

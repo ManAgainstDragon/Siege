@@ -28,8 +28,11 @@ public:
 	void SetGameManager(game_manager* _instance);
 	sf::Font* GetFont();
 
+	void UpdateStatusbar(std::string _status);
+
 private:
 	game_manager* _gmi;
+	std::string _gameName;
 
 };
 

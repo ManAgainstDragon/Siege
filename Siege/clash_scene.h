@@ -8,12 +8,22 @@
 enum ENTITY_TYPE { NONE = -1, AI = 0, PLAYER1 = 1, PLAYER2, PLAYER3, PLAYER4 };
 enum FIELD_TYPE { WASTELAND = -1, FACTORY = 0, UNIT = 1, DEFENDER, CORE };
 
+typedef ENTITY_TYPE TURN;
+
+struct unit {
+	bool _isExisiting;
+};
+
 struct field {
 	ENTITY_TYPE _entity;
 	FIELD_TYPE _field;
-	unsigned short _units;
+	unit _units[10];
 	sf::Vector2f _pos;
 	sf::Vector2f _siz;
+	bool _wasAttacked;
+	unsigned short CountUnits();
+	void TurnAlive(unsigned short k);
+	field();
 };
 
 #define ColorPlayer1	sf::Color(0x66, 0x66, 0xcc) //Ciemnoniebieski, przechodzacy w szary
@@ -47,5 +57,6 @@ private:
 	sf::Vector2i _currentMouseOver;
 	sf::Vector2i _currentChoosen;
 	sf::Font _font;
+	TURN _turn;
 
 };
