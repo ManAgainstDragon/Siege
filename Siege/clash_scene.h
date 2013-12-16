@@ -46,5 +46,6 @@ private:
 	field _checkBoard[CHECKBOARD][CHECKBOARD];
 	sf::Vector2i _currentMouseOver;
 	sf::Vector2i _currentChoosen;
+	sf::Font _font;
 
 };

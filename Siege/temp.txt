@@ -5,3 +5,50 @@ struct field {
 	char* _ownerName;
 	char* _type;
 };
+
+-------------------------------------------------
+#define _pixelW 5
+#define _pixelH 8
+
+#define T 0, 0, 0, 0
+#define B 0, 0, 0, 255
+#define W 255, 255, 255, 255
+/*
+Roman letters definition
+*/
+
+// I - 1
+sf::Uint8 _pixels_I[_pixelW * _pixelH * 4] = {
+	T, B, B, B, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, B, B, B, T
+};
+
+// V - 5
+sf::Uint8 _pixels_V[_pixelW * _pixelH * 4] = {
+	B, T, T, T, B,
+	B, T, T, T, B,
+	B, T, T, T, B,
+	B, T, T, T, B,
+	T, B, T, B, T,
+	T, B, T, B, T,
+	T, T, B, T, T,
+	T, T, B, T, T
+};
+
+// X - 10
+sf::Uint8 _pixels_X[_pixelW * _pixelH * 4] = {
+	B, T, T, T, B,
+	T, B, T, B, T,
+	T, B, T, B, T,
+	T, T, B, T, T,
+	T, T, B, T, T,
+	T, B, T, B, T,
+	T, B, T, B, T,
+	B, T, T, T, B
+};

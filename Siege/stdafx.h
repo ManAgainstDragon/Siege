@@ -1,5 +1,6 @@
 #pragma once
 
+#include "utility.h"
 #include "game_manager.h"
 #include "input_system.h"
 

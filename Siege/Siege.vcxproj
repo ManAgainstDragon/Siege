@@ -94,6 +94,7 @@
   <ItemGroup>
     <ClInclude Include="clash_scene.h" />
     <ClInclude Include="game_manager.h" />
+    <ClInclude Include="utility.h" />
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="input_system.h" />
     <ClInclude Include="scene_template.h" />

@@ -26,6 +26,7 @@ public:
 	void Update(float dt);
 
 	void SetGameManager(game_manager* _instance);
+	sf::Font* GetFont();
 
 private:
 	game_manager* _gmi;

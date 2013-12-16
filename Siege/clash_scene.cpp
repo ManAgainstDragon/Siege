@@ -6,6 +6,7 @@ Constructor
 clash::clash() {
 	_currentMouseOver = sf::Vector2i(0, 0);
 	_currentChoosen = sf::Vector2i(-1, -1);
+	_font.loadFromFile("font.ttf");
 }
 
 /*
@@ -21,9 +22,21 @@ Renders all players positions every frame
 */
 void clash::Render() {
 	sf::RectangleShape temp;
+	sf::Text _number;
+	_number.setFont(_font);
+	_number.setCharacterSize(20);
+	_number.setColor(sf::Color::Black);
 	for (int i = 0; i < CHECKBOARD; i++) {
 		for (int j = 0; j < CHECKBOARD; j++) {
 			DrawUnit(_checkBoard[i][j], sf::Vector2i(i, j));
+			if (_checkBoard[i][j]._field == FACTORY) DrawMarker(sf::Vector2i(i, j), sf::Color::Black);
+			if (_checkBoard[i][j]._entity != NONE) {
+				if (_checkBoard[i][j]._field == FACTORY) _number.setString("F: " + toString(_checkBoard[i][j]._units));
+				else if (_checkBoard[i][j]._field == CORE) _number.setString("CORE: " + toString(_checkBoard[i][j]._units));
+				else _number.setString(toString(_checkBoard[i][j]._units));
+				_number.setPosition(sf::Vector2f(_checkBoard[i][j]._pos.x + 5, _checkBoard[i][j]._pos.y + 5));
+				Window.draw(_number);
+			}
 		}
 	}
 	DrawMarker(_currentMouseOver, sf::Color(47, 47, 79));
@@ -81,7 +94,7 @@ void clash::Load() {
 				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = DEFENDER;
-				_checkBoard[i][j]._units = 6 + (i+j)%2;
+				_checkBoard[i][j]._units = 8 - (i+j)%2;
 			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
