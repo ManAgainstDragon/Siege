@@ -33,7 +33,6 @@ public:
 private:
 	game_manager* _gmi;
 	std::string _gameName;
-
 };
 
 #define Window sys::GetInstance()

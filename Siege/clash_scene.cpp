@@ -6,6 +6,7 @@ All units are dead by default
 field::field() {
 	for (int i = 0; i < 10; i++) {
 		_units[i]._isExisiting = false;
+		_units[i]._hasMoved = false;
 	}
 	_wasAttacked = false;
 }
@@ -40,7 +41,9 @@ clash::clash() {
 	_currentMouseOver = sf::Vector2i(0, 0);
 	_currentChoosen = sf::Vector2i(-1, -1);
 	_font.loadFromFile("font.ttf");
-	_turn = PLAYER1;
+	_turn = AI;
+	NextTurn();
+	_pcTurn = 0;
 }
 
 /*
@@ -81,6 +84,7 @@ void clash::Render() {
 Updates player moves
 */
 void clash::Update(float dt) {
+	_keyPress += dt;
 	for (int i = 0; i < CHECKBOARD; i++) {
 		for (int j = 0; j < CHECKBOARD; j++) {
 			if (IsMouseOver(_checkBoard[i][j])) {
@@ -88,8 +92,24 @@ void clash::Update(float dt) {
 			}
 		}
 	}
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Left))
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		_currentChoosen = _currentMouseOver;
+	}
+	if (_turn == AI) NextTurn();
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.5f) {
+		NextTurn();
+		_keyPress = 0;
+	}
+	if (_turn == AI && _pcTurn == 3) {
+		for (int i = 0; i < CHECKBOARD; i++) {
+			for (int j = 0; j < CHECKBOARD; j++) {
+				if (_checkBoard[i][j]._entity == AI) {
+					_checkBoard[i][j].TurnAlive(1);
+				}
+			}
+		}
+		_pcTurn = 0;
+	}
 }
 
 /*
@@ -128,7 +148,7 @@ void clash::Load() {
 				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = DEFENDER;
-				_checkBoard[i][j].TurnAlive(8 - (i + j) % 2);
+				_checkBoard[i][j].TurnAlive(4 - (i + j) % 2);
 			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
@@ -192,4 +212,22 @@ void clash::DrawMarker(sf::Vector2i pos, sf::Color color) {
 	temp.setOutlineColor(color);
 	temp.setOutlineThickness(5.0f);
 	Window.draw(temp);
+}
+
+/*
+Switches turn to another player
+*/
+void clash::NextTurn() {
+	_turn = (TURN)((_turn + 1) % 5);
+	std::string msg;
+	if (_turn == AI) {
+		msg = "PC makes moves";
+		_pcTurn++;
+	}
+	else if (_turn == 1) msg = "player 1 move";
+	else if (_turn == 2) msg = "player 2 move";
+	else if (_turn == 3) msg = "player 3 move";
+	else if (_turn == 4) msg = "player 4 move";
+
+	Window.UpdateStatusbar(msg);
 }

@@ -12,6 +12,7 @@ typedef ENTITY_TYPE TURN;
 
 struct unit {
 	bool _isExisiting;
+	bool _hasMoved;
 };
 
 struct field {
@@ -52,11 +53,15 @@ public:
 	bool IsMouseOver(field in);
 	void DrawMarker(sf::Vector2i pos, sf::Color color);
 
+	void NextTurn();
+
 private:
 	field _checkBoard[CHECKBOARD][CHECKBOARD];
 	sf::Vector2i _currentMouseOver;
 	sf::Vector2i _currentChoosen;
 	sf::Font _font;
 	TURN _turn;
+	float _keyPress;
+	unsigned short _pcTurn; //Every third turn gets new soldiers
 
 };
