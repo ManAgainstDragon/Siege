@@ -7,8 +7,6 @@ field::field() {
 	for (int i = 0; i < 10; i++) {
 		_units[i]._isExisiting = false;
 	}
-	//_hasMove = CountUnits();
-	_wasAttacked = false;
 }
 
 /*
@@ -30,7 +28,6 @@ void field::TurnAlive(unsigned short k) {
 		if (!_units[i]._isExisiting) {
 			k--;
 			_units[i]._isExisiting = true;
-			//_hasMove--;
 		}
 	}
 }
@@ -38,21 +35,13 @@ void field::TurnAlive(unsigned short k) {
 void field::Kill(unsigned short k) {
 	for (unsigned short i = 9; i >= 0 && k > 0; i--) {
 		if (_units[i]._isExisiting) {
-			//if (_hasMove > 0) {
-				k--;
-				_units[i]._isExisiting = false;
-			//}
+			k--;
+			_units[i]._isExisiting = false;
 		}
 	}
 }
 
-/*
-Makes all units movable by turn start
-*/
-void field::ResetMove() {
-	//_hasMove = CountUnits();
-}
-
+#include "sys.h"
 /*
 Constructor
 */
@@ -60,9 +49,13 @@ clash::clash() {
 	_currentMouseOver = sf::Vector2i(0, 0);
 	_currentChoosen = sf::Vector2i(-1, -1);
 	_font.loadFromFile("font.ttf");
-	_turn = AI;
-	NextTurn();
+	_turn = PLAYER1;
 	_pcTurn = 0;
+	_moves = 1;
+	_movesPPlayer = 1;
+	Window.UpdateStatusbar(toString(_movesPPlayer) + " moves left");
+	_turnCounter = 0;
+	_check = true;
 }
 
 /*
@@ -72,7 +65,6 @@ clash::~clash() {
 
 }
 
-#include "sys.h"
 /*
 Renders all players positions every frame
 */
@@ -118,11 +110,25 @@ void clash::Update(float dt) {
 		_currentChoosen = _currentMouseOver;
 	}
 	// Moving units
-	if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
-		DrawMarker(_currentMouseOver, sf::Color::Red);
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && _currentChoosen.x >= 0 && _keyPress > 0.5f) {
+		int i = _currentChoosen.x;
+		int j = _currentChoosen.y;
+		int x = _currentMouseOver.x;
+		int y = _currentMouseOver.y;
+		if (((abs(x - i) <= 2 && j == y) || (abs(j - y) <= 2 && i == x)) && _movesPPlayer > 0 && _checkBoard[i][j].CountUnits() > 0) {
+			if (_checkBoard[i][j]._entity == _checkBoard[x][y]._entity && _turn == _checkBoard[i][j]._entity)
+				MoveUnit(_currentChoosen, _currentMouseOver);
+			if (_checkBoard[x][y]._entity == NONE && _turn == _checkBoard[i][j]._entity) {
+				_checkBoard[x][y]._entity = _turn;
+				_checkBoard[x][y]._field = UNIT;
+				MoveUnit(_currentChoosen, _currentMouseOver);
+			}
+		}
+
+		_keyPress = 0;
 	}
 	if (_turn == AI) NextTurn();
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.5f) {
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.f) {
 		NextTurn();
 		_keyPress = 0;
 	}
@@ -135,6 +141,16 @@ void clash::Update(float dt) {
 			}
 		}
 		_pcTurn = 0;
+	}
+
+	if (_movesPPlayer > 0) _check = false;
+	if (_moves != _movesPPlayer) {
+		if (_movesPPlayer == 0) Window.UpdateStatusbar("Press ENTER for next turn");
+		else if (_turnCounter == 1 && _movesPPlayer == 0 && _check) {
+			_moves = 1;
+			_check = false;
+		}
+		else Window.UpdateStatusbar(toString(_movesPPlayer) + " moves left");
 	}
 }
 
@@ -174,7 +190,7 @@ void clash::Load() {
 				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = DEFENDER;
-				_checkBoard[i][j].TurnAlive(4 - (i + j) % 2);
+				_checkBoard[i][j].TurnAlive(3 + (i + j) % 2);
 			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
@@ -255,11 +271,25 @@ void clash::NextTurn() {
 	else if (_turn == 3) msg = "player 3 move";
 	else if (_turn == 4) msg = "player 4 move";
 
-	for (int i = 0; i < CHECKBOARD; i++) {
-		for (int j = 0; j < CHECKBOARD; j++) {
-			_checkBoard[i][j].ResetMove();
-		}
+	if (_moves < 0) _moves = 1;
+
+	if (_turn == AI) {
+		if (++_moves > 5) { _moves--; }
 	}
+	else _turnCounter++;
+
+	_movesPPlayer = _moves;
 
 	Window.UpdateStatusbar(msg);
+}
+
+/*
+Swaps units between fields
+*/
+void clash::MoveUnit(sf::Vector2i from, sf::Vector2i to) {
+	if (_movesPPlayer > 0 && _checkBoard[from.x][from.y].CountUnits() > 0) {
+		_checkBoard[from.x][from.y].Kill(1);
+		_checkBoard[to.x][to.y].TurnAlive(1);
+		_movesPPlayer--;
+	}
 }

@@ -43,9 +43,9 @@ void sys::Start() {
 		while (this->pollEvent(_ev)) {
 			InsertEvent(&_ev);
 			if (InEv->type == sf::Event::Closed) Stop();
+			this->Update(_timer.restart().asSeconds());
 		}
 		this->clear(sf::Color(110, 110, 110));
-		this->Update(_timer.restart().asSeconds());
 		this->Render();
 		this->display();
 	}

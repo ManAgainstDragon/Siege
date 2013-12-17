@@ -18,14 +18,11 @@ struct field {
 	ENTITY_TYPE _entity;
 	FIELD_TYPE _field;
 	unit _units[10];
-	//int _hasMove;
 	sf::Vector2f _pos;
 	sf::Vector2f _siz;
-	bool _wasAttacked;
 	unsigned short CountUnits();
 	void TurnAlive(unsigned short k);
 	void Kill(unsigned short k);
-	void ResetMove();
 	field();
 };
 
@@ -57,6 +54,8 @@ public:
 
 	void NextTurn();
 
+	void MoveUnit(sf::Vector2i from, sf::Vector2i to);
+
 private:
 	field _checkBoard[CHECKBOARD][CHECKBOARD];
 	sf::Vector2i _currentMouseOver;
@@ -65,5 +64,7 @@ private:
 	TURN _turn;
 	float _keyPress;
 	unsigned short _pcTurn; //Every third turn gets new soldiers
+	int _moves, _movesPPlayer, _turnCounter;
+	bool _check;
 
 };
