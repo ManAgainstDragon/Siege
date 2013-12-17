@@ -6,8 +6,8 @@ All units are dead by default
 field::field() {
 	for (int i = 0; i < 10; i++) {
 		_units[i]._isExisiting = false;
-		_units[i]._hasMoved = false;
 	}
+	//_hasMove = CountUnits();
 	_wasAttacked = false;
 }
 
@@ -30,8 +30,27 @@ void field::TurnAlive(unsigned short k) {
 		if (!_units[i]._isExisiting) {
 			k--;
 			_units[i]._isExisiting = true;
+			//_hasMove--;
 		}
 	}
+}
+
+void field::Kill(unsigned short k) {
+	for (unsigned short i = 9; i >= 0 && k > 0; i--) {
+		if (_units[i]._isExisiting) {
+			//if (_hasMove > 0) {
+				k--;
+				_units[i]._isExisiting = false;
+			//}
+		}
+	}
+}
+
+/*
+Makes all units movable by turn start
+*/
+void field::ResetMove() {
+	//_hasMove = CountUnits();
 }
 
 /*
@@ -76,8 +95,9 @@ void clash::Render() {
 			}
 		}
 	}
-	DrawMarker(_currentMouseOver, sf::Color(47, 47, 79));
+	DrawMarker(_currentMouseOver, sf::Color(49, 49, 76));
 	if (_currentChoosen.x >= 0) DrawMarker(_currentChoosen, sf::Color(0xb3, 0x68, 0xb3));
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && _currentChoosen != _currentMouseOver) DrawMarker(_currentMouseOver, sf::Color(120, 0, 0));
 }
 
 /*
@@ -85,6 +105,7 @@ Updates player moves
 */
 void clash::Update(float dt) {
 	_keyPress += dt;
+	// Mouse-over type marker
 	for (int i = 0; i < CHECKBOARD; i++) {
 		for (int j = 0; j < CHECKBOARD; j++) {
 			if (IsMouseOver(_checkBoard[i][j])) {
@@ -92,8 +113,13 @@ void clash::Update(float dt) {
 			}
 		}
 	}
+	// Selection tool
 	if (sf::Mouse::isButtonPressed(sf::Mouse::Left)) {
 		_currentChoosen = _currentMouseOver;
+	}
+	// Moving units
+	if (sf::Mouse::isButtonPressed(sf::Mouse::Right)) {
+		DrawMarker(_currentMouseOver, sf::Color::Red);
 	}
 	if (_turn == AI) NextTurn();
 	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.5f) {
@@ -210,7 +236,7 @@ void clash::DrawMarker(sf::Vector2i pos, sf::Color color) {
 	temp.setPosition(sf::Vector2f((pos.x + 1)*GRID_SIZE + pos.x*_siz.x, (pos.y + 1)*GRID_SIZE + pos.y*_siz.y));
 	temp.setFillColor(sf::Color::Transparent);
 	temp.setOutlineColor(color);
-	temp.setOutlineThickness(5.0f);
+	temp.setOutlineThickness(5); // Or thickness = 3, to be decided
 	Window.draw(temp);
 }
 
@@ -228,6 +254,12 @@ void clash::NextTurn() {
 	else if (_turn == 2) msg = "player 2 move";
 	else if (_turn == 3) msg = "player 3 move";
 	else if (_turn == 4) msg = "player 4 move";
+
+	for (int i = 0; i < CHECKBOARD; i++) {
+		for (int j = 0; j < CHECKBOARD; j++) {
+			_checkBoard[i][j].ResetMove();
+		}
+	}
 
 	Window.UpdateStatusbar(msg);
 }

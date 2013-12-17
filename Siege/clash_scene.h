@@ -12,18 +12,20 @@ typedef ENTITY_TYPE TURN;
 
 struct unit {
 	bool _isExisiting;
-	bool _hasMoved;
 };
 
 struct field {
 	ENTITY_TYPE _entity;
 	FIELD_TYPE _field;
 	unit _units[10];
+	//int _hasMove;
 	sf::Vector2f _pos;
 	sf::Vector2f _siz;
 	bool _wasAttacked;
 	unsigned short CountUnits();
 	void TurnAlive(unsigned short k);
+	void Kill(unsigned short k);
+	void ResetMove();
 	field();
 };
 
