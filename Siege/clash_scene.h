@@ -65,6 +65,6 @@ private:
 	float _keyPress;
 	unsigned short _pcTurn; //Every third turn gets new soldiers
 	int _moves, _movesPPlayer, _turnCounter;
-	bool _check;
+	bool _check, _player[4];
 
 };

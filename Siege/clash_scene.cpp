@@ -56,6 +56,7 @@ clash::clash() {
 	Window.UpdateStatusbar(toString(_movesPPlayer) + " moves left");
 	_turnCounter = 0;
 	_check = true;
+	_keyPress = 10.f;
 }
 
 /*
@@ -97,6 +98,12 @@ Updates player moves
 */
 void clash::Update(float dt) {
 	_keyPress += dt;
+	if (_turn == AI) NextTurn();
+	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.f) {
+		NextTurn();
+		_keyPress = 0;
+	}
+
 	// Mouse-over type marker
 	for (int i = 0; i < CHECKBOARD; i++) {
 		for (int j = 0; j < CHECKBOARD; j++) {
@@ -110,7 +117,7 @@ void clash::Update(float dt) {
 		_currentChoosen = _currentMouseOver;
 	}
 	// Moving units
-	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && _currentChoosen.x >= 0 && _keyPress > 0.5f) {
+	else if (sf::Mouse::isButtonPressed(sf::Mouse::Right) && _currentChoosen.x >= 0 && _keyPress > 0.2f) {
 		int i = _currentChoosen.x;
 		int j = _currentChoosen.y;
 		int x = _currentMouseOver.x;
@@ -123,16 +130,27 @@ void clash::Update(float dt) {
 				_checkBoard[x][y]._field = UNIT;
 				MoveUnit(_currentChoosen, _currentMouseOver);
 			}
+			if (_checkBoard[x][y]._entity > 0 && _checkBoard[x][y]._entity != _checkBoard[i][j]._entity) {
+				if (_checkBoard[x][y].CountUnits() > 0 && _checkBoard[i][j].CountUnits() > 0) {
+					_checkBoard[x][y].Kill(1);
+					_checkBoard[i][j].Kill(1);
+				}
+				else if (_checkBoard[x][y].CountUnits() == 0 && _checkBoard[i][j].CountUnits() > 0)	{
+					if (_checkBoard[x][y]._field == FACTORY) {
+						_checkBoard[x][y]._field = UNIT;
+						_player[_checkBoard[x][y]._entity - 1] = false;
+					}
+					_checkBoard[x][y]._entity = _checkBoard[i][j]._entity;
+					MoveUnit(_currentChoosen, _currentMouseOver);
+				}
+			}
 		}
 
 		_keyPress = 0;
 	}
-	if (_turn == AI) NextTurn();
-	else if (sf::Keyboard::isKeyPressed(sf::Keyboard::Key::Return) && _keyPress > 1.f) {
-		NextTurn();
-		_keyPress = 0;
-	}
-	if (_turn == AI && _pcTurn == 3) {
+
+	// Every			this argument	pc and players gets units
+	if (_turn == AI && _pcTurn == 2) {
 		for (int i = 0; i < CHECKBOARD; i++) {
 			for (int j = 0; j < CHECKBOARD; j++) {
 				if (_checkBoard[i][j]._entity == AI) {
@@ -140,6 +158,22 @@ void clash::Update(float dt) {
 				}
 			}
 		}
+
+		for (int i = 1; i <= 4; i++) {
+			int ww = 0, wh = 0;
+			if (i == 1 || i == 2) wh = 1;
+			if (i == 1 || i == 3) ww = 1;
+			if (i == 3 || i == 4) wh = CHECKBOARD - 2;
+			if (i == 2 || i == 4) ww = CHECKBOARD - 2;
+			if (_checkBoard[ww][wh]._entity == NONE) {
+				_checkBoard[ww][wh]._entity = (ENTITY_TYPE) (i);
+				_checkBoard[ww][wh]._field = UNIT;
+			}
+			if (_checkBoard[ww][wh]._entity == (ENTITY_TYPE) (i) && _player[_checkBoard[ww][wh]._entity-1]) {
+				_checkBoard[ww][wh].TurnAlive(2);
+			}
+		}
+
 		_pcTurn = 0;
 	}
 
@@ -163,22 +197,22 @@ void clash::Load() {
 			if (i == 0 && j == 0) {
 				_checkBoard[i][j]._entity = PLAYER1;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j].TurnAlive(10);
+				_checkBoard[i][j].TurnAlive(1);
 			}
 			else if (i == 0 && j == CHECKBOARD - 1) {
 				_checkBoard[i][j]._entity = PLAYER3;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j].TurnAlive(10);
+				_checkBoard[i][j].TurnAlive(1);
 			}
 			else if (i == CHECKBOARD - 1 && j == 0) {
 				_checkBoard[i][j]._entity = PLAYER2;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j].TurnAlive(10);
+				_checkBoard[i][j].TurnAlive(1);
 			}
 			else if (i == CHECKBOARD - 1 && j == CHECKBOARD - 1) {
 				_checkBoard[i][j]._entity = PLAYER4;
 				_checkBoard[i][j]._field = FACTORY;
-				_checkBoard[i][j].TurnAlive(10);
+				_checkBoard[i][j].TurnAlive(1);
 			}
 			else if (i == floor((double) CHECKBOARD/2) && j == floor((double) CHECKBOARD/2)) {
 				_checkBoard[i][j]._entity = AI;
@@ -190,7 +224,7 @@ void clash::Load() {
 				!(i == floor((double) CHECKBOARD / 2) && j == floor((double) CHECKBOARD / 2))) {
 				_checkBoard[i][j]._entity = AI;
 				_checkBoard[i][j]._field = DEFENDER;
-				_checkBoard[i][j].TurnAlive(3 + (i + j) % 2);
+				_checkBoard[i][j].TurnAlive(2 + (i + j) % 2);
 			}
 			else {
 				_checkBoard[i][j]._entity = NONE;
@@ -262,10 +296,12 @@ Switches turn to another player
 void clash::NextTurn() {
 	_turn = (TURN)((_turn + 1) % 5);
 	std::string msg;
+
 	if (_turn == AI) {
 		msg = "PC makes moves";
 		_pcTurn++;
 	}
+	else if (_player[_turn - 1] == false) return;
 	else if (_turn == 1) msg = "player 1 move";
 	else if (_turn == 2) msg = "player 2 move";
 	else if (_turn == 3) msg = "player 3 move";
