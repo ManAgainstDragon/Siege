@@ -5,6 +5,7 @@
 
 #include "scene_template.h"
 #include "clash_scene.h"
+#include "won_scene.h"
 
 class game_manager {
 	/* functional */
@@ -20,6 +21,8 @@ public:
 	virtual void MoveInto(std::string _scene);
 
 	virtual scene_template* GetCurrentScene();
+
+	int _winner;
 
 protected:
 	std::vector<scene_template*> _scenes;

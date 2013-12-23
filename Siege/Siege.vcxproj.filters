@@ -17,6 +17,9 @@
     <ClCompile Include="clash_scene.cpp">
       <Filter>Game</Filter>
     </ClCompile>
+    <ClCompile Include="won_scene.cpp">
+      <Filter>Game</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <Filter Include="System">
@@ -45,6 +48,9 @@
     <ClInclude Include="stdafx.h" />
     <ClInclude Include="utility.h">
       <Filter>System</Filter>
+    </ClInclude>
+    <ClInclude Include="won_scene.h">
+      <Filter>Game</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

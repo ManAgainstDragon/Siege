@@ -30,6 +30,8 @@ public:
 
 	void UpdateStatusbar(std::string _status);
 
+	game_manager* GetGameManager();
+
 private:
 	game_manager* _gmi;
 	std::string _gameName;

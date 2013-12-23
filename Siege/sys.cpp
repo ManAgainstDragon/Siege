@@ -86,3 +86,7 @@ Puts "GameName - status" in titlebar
 void sys::UpdateStatusbar(std::string status) {
 	this->setTitle(_gameName + " - " + status);
 }
+
+game_manager* sys::GetGameManager() {
+	return _gmi;
+}

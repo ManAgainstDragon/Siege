@@ -8,6 +8,7 @@ Constructor, creating instancs of all scenes and setups
 */
 game_manager::game_manager() {
 	addScene(clash);
+	addScene(won);
 
 	_current = 0;
 	GetCurrentScene()->Load();
@@ -39,7 +40,8 @@ Places iterator forward
 */
 void game_manager::MoveForward() {
 	GetCurrentScene()->Unload();
-	if (++_current >= _sceneNames.size()) --_current;
+	_current++;
+	if (_current >= _sceneNames.size()) --_current;
 	GetCurrentScene()->Load();
 }
 
@@ -48,7 +50,8 @@ Places iterator backwards
 */
 void game_manager::MoveBackward() {
 	GetCurrentScene()->Unload();
-	if (--_current < 0) _current = 0;
+	_current--;
+	if (_current < 0) _current = 0;
 	GetCurrentScene()->Load();
 }
 
