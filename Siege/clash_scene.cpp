@@ -157,14 +157,16 @@ void clash::Update(float dt) {
 		_keyPress = 0;
 	}
 
-	// Every			this argument	pc and players gets units
-	if (_turn == AI && _pcTurn == 2) {
-		for (int i = 0; i < CHECKBOARD; i++) {
-			for (int j = 0; j < CHECKBOARD; j++) {
-				if (_checkBoard[i][j]._entity == AI) {
-					_checkBoard[i][j].TurnAlive(1);
+	if (_turn == AI && _pcTurn >= 2 && _pcTurn != 3) {
+		if (_pcTurn == 4) {
+			for (int i = 0; i < CHECKBOARD; i++) {
+				for (int j = 0; j < CHECKBOARD; j++) {
+					if (_checkBoard[i][j]._entity == AI) {
+						_checkBoard[i][j].TurnAlive(1);
+					}
 				}
 			}
+			_pcTurn = 0;
 		}
 
 		for (int i = 1; i <= 2; i++) {
@@ -181,8 +183,6 @@ void clash::Update(float dt) {
 				_checkBoard[ww][wh].TurnAlive(2);
 			}
 		}
-
-		_pcTurn = 0;
 	}
 
 	if (_movesPPlayer > 0) _check = false;
@@ -316,12 +316,11 @@ void clash::NextTurn() {
 	else if (_turn == 2) msg = "player 2 move";
 	//else if (_turn == 3) msg = "player 3 move";
 	//else if (_turn == 4) msg = "player 4 move";
-
+	
+	_movesPPlayer = _moves;
 	if (_moves < 0) _moves = 1;
 
 	else _turnCounter++;
-
-	_movesPPlayer = _moves;
 
 	Window.UpdateStatusbar(msg);
 }
